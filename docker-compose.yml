@@ -7,8 +7,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_USER: user
-      MYSQL_PASSWORD: password
-      MYSQL_DATABASE: laravel
+      MYSQL_PASSWORD: yourpassworddatabase
     volumes:
       - mysql-data:/var/lib/mysql
     networks:
@@ -49,7 +48,7 @@ services:
     container_name: php
     build:
       context: ./dockerfiles
-      dockerfile: php.root.dockerfile
+      dockerfile: php.dockerfile
       args:
         - UID=${UID:-1000}
         - GID=${GID:-1000}
@@ -57,6 +56,7 @@ services:
       - "9000:9000"
     volumes:
       - ./html:/var/www/html
+      - ./dockerfiles/php/local.ini:/usr/local/etc/php/conf.d/local.ini
     networks:
       - mynet
     restart: always
@@ -75,6 +75,8 @@ services:
   redis_insight:
     container_name: redis_insight
     image: redislabs/redisinsight:latest
+    environment:
+      - RITRUSTEDORIGINS=urlDomainServer
     volumes:
       - redis_insight:/db
     ports:
@@ -85,6 +87,8 @@ services:
 
 networks:
   mynet:
+    name: mynet
+    driver: bridge
 volumes:
   mysql-data:
     external: false
