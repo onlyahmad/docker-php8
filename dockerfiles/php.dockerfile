@@ -24,6 +24,18 @@ RUN echo "php_admin_flag[log_errors] = on" >> /usr/local/etc/php-fpm.d/www.conf
 
 RUN docker-php-ext-install pdo pdo_mysql
 
+RUN apk add --no-cache --virtual .phpize-deps $PHPIZE_DEPS 
+RUN apk add --update linux-headers \
+ libjpeg-turbo-dev \
+  libwebp-dev \
+  libpng-dev
+  # extention gd 
+
+RUN docker-php-ext-configure gd --with-jpeg
+# RUN docker-php-ext-configure gd
+# RUN docker-php-ext-install gd
+RUN docker-php-ext-install -j$(nproc) gd
+# RUN apk add php8.1-gd
 USER laravel
 
 CMD ["php-fpm", "-y", "/usr/local/etc/php-fpm.conf", "-R"]
